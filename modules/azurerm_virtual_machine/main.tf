@@ -43,22 +43,4 @@ resource "azurerm_linux_virtual_machine" "example" {
     sku       = var.os_sku
     version   = var.os_version
   }
-#  custom_data          = base64encode(<<-EOF
-#     #!/bin/bash
-
-#     # Update & install required packages
-#     apt-get update -y
-#     apt-get install -y docker.io unzip curl apt-transport-https ca-certificates software-properties-common gnupg
-
-#     # Enable Docker
-#     systemctl enable docker
-#     systemctl start docker
-
-#     # Add user to Docker group
-#     usermod -aG docker azureuser
-
-#     # Pull & run SonarQube container
-#     docker run -d --name sonarqube -p 9000:9000 sonarqube:lts
-#   EOF
-#   )
 }

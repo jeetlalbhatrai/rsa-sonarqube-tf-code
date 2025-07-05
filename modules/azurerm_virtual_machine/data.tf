@@ -20,11 +20,6 @@ data "azurerm_key_vault_secret" "secretname" {
   key_vault_id = data.azurerm_key_vault.kv.id
 }
 
-# data "azurerm_key_vault_secret" "example" {
-#   name         = "secret-sauce"
-#   key_vault_id = data.azurerm_key_vault.existing.id
-# }
-
 data "azurerm_network_security_group" "existing_nsg" {
   name                = var.nsg_name           
   resource_group_name = var.resource_group_name              

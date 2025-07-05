@@ -10,11 +10,6 @@ variable "resource_group_name" {
   description = "Resource group name"
 }
 
-# variable "key_vault_secrets" {
-#   description = "Map of secrets to create in Key Vault"
-#   type        = map(any)
-# }
-
 variable "key_vault_secrets" {
   description = "Map of secret blocks, each with a name and value"
   type = map(object({
