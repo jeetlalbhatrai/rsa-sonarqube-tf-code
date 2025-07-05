@@ -43,16 +43,16 @@ module "rsa_vm" {
   os_sku                  = "22_04-lts"
   os_version              = "latest"
   network_nic_name        = "rsa-nic"
-  rsa_subnet_name    = "rsa-subnet"
+  rsa_subnet_name         = "rsa-subnet"
   virtual_network_name    = "rsa-vnet"
-  public_ip_address_name = "rsa-public-ip"
-  key_vault_name = "rsa-keyvault-jeet"
-  nsg_name = "rsa-vm-nsg"
+  public_ip_address_name  = "rsa-public-ip"
+  key_vault_name          = "rsa-keyvault-jeet"
+  nsg_name                = "rsa-vm-nsg"
   secretname = {
     vm_username = "vm-username"
     vm_password = "vm-password"
   }
-  custom_data          = base64encode(<<-EOF
+  custom_data = base64encode(<<-EOF
     #!/bin/bash
 
     # Update & install required packages
@@ -73,30 +73,19 @@ module "rsa_vm" {
 }
 
 module "key_vault" {
-  depends_on              = [module.resource_group]
-  source                  = "../modules/azure_key_vault"
-  key_vault_name          = "rsa-keyvault-jeet"
-  resource_group_name     = "rsa-rg"
-  resource_group_location = "centralindia"
+  depends_on                 = [module.resource_group]
+  source                     = "../modules/azure_key_vault"
+  key_vault_name             = "rsa-keyvault-jeet"
+  resource_group_name        = "rsa-rg"
+  resource_group_location    = "centralindia"
   soft_delete_retention_days = 7
-  # key_vault_secrets = {
-  #   vm_password = {
-  #     name  = "vm-password"
-  #     value = "rsa@123"
-  #   },
-  #   vm_username = {
-  #     name  = "vm-username"
-  #     value = "rsaadmin"
-  #   }
-  # }
 }
 
 module "key_vault_secrets" {
-  depends_on              = [module.key_vault]
-  source                  = "../modules/azure_key_vault_secret"
-  key_vault_name          = "rsa-keyvault-jeet"
-  resource_group_name     = "rsa-rg"
-  # resource_group_location = "centralindia"
+  depends_on          = [module.key_vault]
+  source              = "../modules/azure_key_vault_secret"
+  key_vault_name      = "rsa-keyvault-jeet"
+  resource_group_name = "rsa-rg"
   key_vault_secrets = {
     vm_password = {
       name  = "vm-password"
@@ -111,10 +100,11 @@ module "key_vault_secrets" {
 
 
 module "nsg" {
-  source        = "../modules/azurerm_nsg"
-  nsg_name      = "rsa-vm-nsg"
-  resource_group_location      = "centralindia"
-  resource_group_name       = "rsa-rg"
+  depends_on = [module.resource_group] 
+  source                  = "../modules/azurerm_nsg"
+  nsg_name                = "rsa-vm-nsg"
+  resource_group_location = "centralindia"
+  resource_group_name     = "rsa-rg"
   security_rules = [
     {
       name                       = "ssh-22"
@@ -137,6 +127,19 @@ module "nsg" {
       destination_port_range     = "9000"
       source_address_prefix      = "*"
       destination_address_prefix = "*"
+    },
+    {
+      name                       = "node-80"
+      priority                   = 111
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "80"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
     }
   ]
 }
+
+
