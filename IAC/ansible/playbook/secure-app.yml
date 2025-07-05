@@ -1,0 +1,47 @@
+---
+#ansible-playbook -i hosts.ini playbooks/secure-app.yml
+- name: Harden and deploy Nginx on Front‑End tier
+  hosts: frontend
+  become: yes
+  vars:
+    http_port: 80
+    https_port: 443
+  tasks:
+    - name: Ensure packages are up‑to‑date (Debian family example)
+      apt:
+        update_cache: yes
+        upgrade: dist
+      when: ansible_os_family == "Debian"
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Copy hardened Nginx config
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload nginx
+
+    - name: Configure UFW firewall
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+      loop:
+        - "{{ http_port }}"
+        - "{{ https_port }}"
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded

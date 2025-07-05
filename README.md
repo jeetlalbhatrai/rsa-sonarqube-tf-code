@@ -1,1 +1,0 @@
-# rsa-sonarqube-tf-code
