@@ -1,0 +1,12 @@
+# charts/frontend/values.yaml
+servicename: backend
+appName: backend
+replicaCount: 1
+image:
+  repository: rsaimage.azurecr.io/backend
+  tag: "v1"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080

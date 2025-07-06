@@ -1,0 +1,2 @@
+# charts/frontend/values.yaml
+#helm template . -f ../../value-store/frontend.yaml
