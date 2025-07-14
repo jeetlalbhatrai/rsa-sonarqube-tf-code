@@ -4,16 +4,37 @@ module "resource_group" {
   resource_group_location = "East US"
 }
 
-module "aks" {
+module "vnet" {
+  source              = "../modules/vnet"
   depends_on            = [module.resource_group]
+  vnet_name           = "rsa-aks-vnet"
+  location            = module.resource_group.resource_group_location
+  resource_group_name = module.resource_group.resource_group_name
+  address_space       = ["192.168.0.0/16"]
+}
+
+module "subnet" {
+  source              = "../modules/subnet"
+  depends_on            = [module.resource_group, module.vnet]
+  vnet_name           = module.vnet.vnet_name
+  resource_group_name = module.resource_group.resource_group_name
+  subnets = {
+    private = { name = "private-subnet", address_prefix = "192.168.1.0/24" }
+  }
+}
+
+module "aks" {
+  depends_on            = [module.resource_group,module.vnet, module.subnet]
   source                = "../modules/aks"
   cluster_name          = "rsa-aks-cluster"
-  location              = "East US"
-  resource_group_name   = "rsa-aks"
-  default_node_pool_name = "default"
+  location              = module.resource_group.resource_group_location
+  resource_group_name   = module.resource_group.resource_group_name
+  default_node_pool_name = "frontend"
   default_node_count    = 1
   default_node_pool_vm_size = "Standard_D2s_v3"
   dns_prefix            = "rsaaksdns"
+  vnet_subnet_id        = module.subnet.subnet_ids["private"]
+
 }
 
 # module "sql_server" {
@@ -51,10 +72,10 @@ module "aks" {
 # module "key_vault" {
 #   depends_on              = [module.resource_group]
 #   source                  = "../modules/azure_key_vault"
-#   key_vault_name          = "rsa-keyvault"
-#   resource_group_name     = "rsa-aks"
-#   resource_group_location = "centralindia"
-#   tenant_id               = "ec303232-515f-4ef2-a3d5-df83712a9eb0"
+#   key_vault_name          = "rsa-keyvault-test34"
+#   resource_group_name     = module.resource_group.resource_group_name
+#   resource_group_location = module.resource_group.resource_group_location
+#   # tenant_id               = "a17cb07c-9570-4b4a-a878-951e4ce8b011"
 #   soft_delete_retention_days = 7
 #   key_vault_secrets = {
 #     db_username = {
@@ -70,13 +91,14 @@ module "aks" {
 
 
 
-# module "node_pool" {
-#   source                = "../modules/node_pool"
-#   depends_on            = [module.aks, module.resource_group]
-#   cluster_name = module.aks.cluster_name 
-#   kubernetes_cluster_id = module.aks.cluster_id
-#   rg_name = "rsa-aks"
-#   node_pools = {
-#     "frontend" = { vm_size = "Standard_D2s_v3", node_count = 1, mode = "User" }
-#   }
-# }
+module "node_pool" {
+  source                = "../modules/node_pool"
+  depends_on            = [module.aks, module.resource_group, module.vnet, module.subnet]
+  cluster_name = module.aks.cluster_name 
+  kubernetes_cluster_id = module.aks.cluster_id
+  rg_name = module.resource_group.resource_group_name
+  node_pools = {
+    "backend" = { vm_size = "Standard_D2s_v3", node_count = 1, mode = "User", subnet_id = module.subnet.subnet_ids["private"]  }
+  }
+}
+
