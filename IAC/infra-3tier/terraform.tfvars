@@ -1,12 +1,12 @@
 rg_name   = "rsa-3tier"
 location  = "East US"
 vnet_name = "rsa-vnet-3tier"
-vnet_cidr = ["10.0.0.0/16"]
+vnet_cidr = ["192.168.0.0/16"]
 
 subnets = {
-  frontend = { address_prefixes = ["10.0.1.0/24"] }
-  backend  = { address_prefixes = ["10.0.2.0/24"] }
-  db       = { address_prefixes = ["10.0.3.0/24"] }
+  frontend = { address_prefixes = ["192.168.1.0/24"] }
+  backend  = { address_prefixes = ["192.168.2.0/24"] }
+  db       = { address_prefixes = ["192.168.3.0/24"] }
 }
 
 nsgs = {
@@ -32,7 +32,7 @@ nsgs = {
         direction               = "Inbound"
         access                  = "Allow"
         protocol                = "Tcp"
-        source_address_prefixes = ["10.0.1.0/24"]
+        source_address_prefixes = ["192.168.1.0/24"]
         destination_port_ranges = ["8080"]
       }
     ]
@@ -46,7 +46,7 @@ nsgs = {
         direction               = "Inbound"
         access                  = "Allow"
         protocol                = "Tcp"
-        source_address_prefixes = ["10.0.2.0/24"]
+        source_address_prefixes = ["192.168.2.0/24"]
         destination_port_ranges = ["1433", "5432"]
       }
     ]
