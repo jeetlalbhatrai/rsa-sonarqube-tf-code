@@ -3,10 +3,10 @@ servicename: frontend
 appName: frontend
 replicaCount: 1
 image:
-  repository: rsaimage.azurecr.io/frontend
-  tag: "v1"
+  repository: linuxserver/firefox
+  tag: "latest"
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 80
+  port: 3001

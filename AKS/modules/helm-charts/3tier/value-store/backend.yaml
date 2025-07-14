@@ -3,10 +3,10 @@ servicename: backend
 appName: backend
 replicaCount: 1
 image:
-  repository: rsaimage.azurecr.io/backend
-  tag: "v1"
+  repository: nginx
+  tag: "latest"
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 8080
+  port: 80
