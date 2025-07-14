@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.servicename }}
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -12,9 +13,20 @@ spec:
       labels:
         app: {{ .Values.servicename }}
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: {{ .Values.nodeAffinity.key }}
+                    operator: {{ .Values.nodeAffinity.operator }}
+                    values:
+                      {{- toYaml .Values.nodeAffinity.values | nindent 22 }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
       containers:
         - name: {{ .Values.appName }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 80
+            - containerPort: {{ .Values.containerPort }}

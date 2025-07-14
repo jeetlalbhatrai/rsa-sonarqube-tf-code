@@ -15,3 +15,7 @@ variable "dns_prefix" {
   description = "The DNS prefix for the AKS cluster"
   type        = string
 }
+variable "vnet_subnet_id" {
+  description = "The ID of the subnet to attach the AKS cluster to"
+  type        = string
+}

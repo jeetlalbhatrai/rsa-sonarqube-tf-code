@@ -29,3 +29,9 @@ variable "key_vault_secrets" {
   type        = map(any)
   description = "Name of the Key Vault secret"
 }
+
+# variable "key_vault_id" {
+#   type        = string
+#   default     = ""
+#   description = "ID of the Key Vault
+#   }

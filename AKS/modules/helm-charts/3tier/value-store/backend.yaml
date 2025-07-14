@@ -1,5 +1,6 @@
 # charts/frontend/values.yaml
 servicename: backend
+namespace: backend
 appName: backend
 replicaCount: 1
 image:
@@ -7,6 +8,21 @@ image:
   tag: "latest"
   pullPolicy: IfNotPresent
 
+containerPort: 80
+
 service:
   type: ClusterIP
   port: 80
+
+nodeAffinity:
+  key: agentpool
+  operator: In
+  values:
+    - backend
+
+tolerations:
+  - key: "role"
+    operator: "Equal"
+    value: "backend"
+    effect: "NoSchedule"
+
